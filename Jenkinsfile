@@ -7,9 +7,14 @@ pipeline {
             maven 'maven 3.8.1'
         }
     stages {
-        stage('build') {
+        stage('Build') {
             steps {
-                sh 'mvn clean install'
+                sh './gradlew assemble'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh './gradlew test'
             }
         }
     }
