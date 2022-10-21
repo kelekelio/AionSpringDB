@@ -33,9 +33,8 @@ Resources:
       ContainerDefinitions:
         - Name: !Sub ${ServiceName}-container
           Image: !Sub ${DockerHubUsername}/${ServiceName}:${ServiceVersion}
-          repositoryCredentials: {
-            "credentialsParameter": "arn:aws:secretsmanager:eu-central-1:930129503882:secret:docker-hub-YhZr5T"
-          }
+          RepositoryCredentials:
+            CredentialsParameter: arn:aws:secretsmanager:eu-central-1:930129503882:secret:docker-hub-YhZr5T
           PortMappings:
             - ContainerPort: 8080
       RequiresCompatibilities:
