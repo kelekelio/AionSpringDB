@@ -5,6 +5,7 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.13.6'
     id 'com.palantir.docker' version '0.34.0'
     id 'com.palantir.docker-run' version '0.34.0'
+    id 'jp.classmethod.aws.reboot.cloudformation' version '0.45'
 }
 
 group = 'com.aionpowerbook'
@@ -19,7 +20,6 @@ configurations {
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
@@ -62,4 +62,19 @@ dockerRun {
     image imageName
     ports '8080:8080'
     clean true
+}
+
+aws {
+    region = findProperty('region') ?: 'eu-central-1'
+}
+
+cloudFormation {
+    stackName "$project.name-stack"
+    stackParams([
+            SubnetID: findProperty('subnetId') ?: '',
+            ServiceName: project.name,
+            ServiceVersion: project.version,
+            DockerHubUsername: dockerHubUsernameProperty
+    ])
+    templateFile project.file("ecs.yml")
 }
