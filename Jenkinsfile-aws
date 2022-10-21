@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+    triggers {
+            pollSCM '*/20 * * * *'
+        }
+    tools {
+            maven 'maven 3.8.1'
+        }
+    stages {
+        stage('Build') {
+            steps {
+                sh "chmod +x gradlew"
+                sh './gradlew assemble'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh "chmod +x gradlew"
+                sh './gradlew test'
+            }
+        }
+        stage('Docker Image') {
+            steps {
+                sh "chmod +x gradlew"
+                sh './gradlew docker'
+            }
+        }
+        stage('Push Docker Image') {
+            environment {
+                DOCKER_HUB_LOGIN = credentials('docker-hub')
+            }
+            steps {
+                sh "chmod +x gradlew"
+                sh 'docker login --username=$DOCKER_HUB_LOGIN_USR --password=$DOCKER_HUB_LOGIN_PSW'
+                sh './gradlew dockerPush -PdockerHubUsername=$DOCKER_HUB_LOGIN_USR'
+            }
+        }
+        stage('Push to AWS') {
+                    environment {
+                        DOCKER_HUB_LOGIN = credentials('docker-hub')
+                    }
+                    steps {
+                        withAWS(credentials : 'aws-credentials', region : env.REGION) {
+                            sh './gradlew awsCfnMigrateStack awsCfnWaitStackComplete -PsubnetId=$SUBNET_ID -PdockerHubUsername=$DOCKER_HUB_LOGIN_USR -Pregion=$AWS_REGION'
+                        }
+                    }
+                }
+    }
+}

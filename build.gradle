@@ -49,7 +49,7 @@ test {
 }
 
 String dockerHubUsernameProperty = findProperty('dockerHubUsername') ?: 'kelekelio'
-String imageName = "${dockerHubUsernameProperty}/aionspringdb:$version"
+String imageName = "${dockerHubUsernameProperty}/AionSpringDB:$version"
 
 docker {
     name imageName
